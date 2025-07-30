@@ -10,7 +10,7 @@
 
 A modular travel assistant built using **LangChain**, **Streamlit**, and **RAG** to answer flight and visa-related queries in natural language.
 
-![UI Image](images\flight.png)
+![UI Image](images/flight.png)
 
 ---
 
