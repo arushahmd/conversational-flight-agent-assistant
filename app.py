@@ -5,7 +5,10 @@ from parsers.query_parser import parse_user_query
 from flight_search.search import get_available_routes
 from utils.rag_utils import create_qa_chain
 
-st.set_page_config(page_title="Flight Booking Assistant", page_icon="✈️", layout="centered") #Title of the page
+st.set_page_config(page_title="✈️ Flight Booking Assistant", page_icon="✈️", layout="centered") #Title of the page
+
+with st.sidebar:
+    st.sidebar.title("✈️ FlightQuery")
 
 query_type = st.sidebar.radio(
     "Choose the type of query:",
@@ -22,7 +25,7 @@ with st.sidebar.expander("💡 What can I ask?"):
     st.markdown("- Do I need a visa to go from UAE to Japan?")
     st.markdown("- Visa policy for Pakistani citizens visiting the UK")
 
-st.markdown("<h1 style='text-align: center;'>Flight Booking Assistant</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;'>Flight Booking Assistant</h2>", unsafe_allow_html=True)
 st.markdown("#### Ask your question below:")
 
 placeholder_text = (
