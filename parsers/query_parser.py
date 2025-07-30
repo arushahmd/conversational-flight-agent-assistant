@@ -1,4 +1,5 @@
 import os
+from typing import List
 from dotenv import load_dotenv
 
 from flight_search.search import load_flights, match_flights
@@ -6,7 +7,7 @@ from utils.rag_utils import create_qa_chain
 load_dotenv()
 
 from langchain.output_parsers import PydanticOutputParser
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 from langchain.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_community.vectorstores import FAISS
@@ -23,10 +24,47 @@ class FlightSearchQuery(BaseModel):
     avoid_overnight_layovers: bool = Field(False, description="Avoid overnight layovers")
     layovers: str = Field("", description="List of layovers")
 
-parser = PydanticOutputParser(pydantic_object=FlightSearchQuery)
+
+class FlightSearchList(RootModel[List[FlightSearchQuery]]):
+    pass
+
+
+parser = PydanticOutputParser(pydantic_object=FlightSearchList)
+
+flight_template = """
+                    You are an AI assistant helping users search for flights.
+
+                    Your task is to extract structured flight search parameters from the user's query. The user may request information for one or more flights.
+
+                    -  Output must always be a JSON **list of objects**, even if only one flight is mentioned.
+                    - Each JSON object must match the format below exactly, using **all fields** from the format instructions.
+                    - If a field is not mentioned or implied in the user query, use a **default empty value**:
+                        - Use `""` for strings
+                        - Use `false` for booleans
+                        - Use `[]` for lists
+                        - Use `0` for numbers if appropriate
+
+                    ---
+
+                    User Query:
+                    {query}
+
+                    Format Instructions:
+                    {format_instructions}
+
+                    Notes:
+                    - The user may describe multiple flights in one sentence, like:
+                    `"Search Dubai to Tokyo, Dubai to Frankfurt, Lahore, Turkey to Tokyo"`
+                    - Extract each pair as a separate object.
+                    - Normalize city names (trim spaces, use standard casing).
+                    - Do **not** guess values that are not present — just leave them empty as instructed.
+
+                    Output:
+                    Return a valid JSON list of all flight search objects.
+"""
 
 prompt = PromptTemplate(
-    template="Extract flight search parameters from this query:\n{query}\n\n{format_instructions}",
+    template=flight_template,
     input_variables=["query"],
     partial_variables={"format_instructions": parser.get_format_instructions()},
 )
@@ -56,13 +94,11 @@ def get_flight_info(query: str): # TODO: place the function in correct module
         Returns flight json and matched flights, top-3 flight details are returned for now.
     """
     parsed = llm_chain.invoke(query)
-    # print("Parsed Query:", parsed)
-    # print("Type of Parsed:", type(parsed))
-    flight_query = parsed.dict()
+    queries = [q.dict() for q in parsed.root]
     flights = load_flights()
-    results = match_flights(flight_query, flights)
+    results = match_flights(queries, flights)
 
-    return results or "No matching flights found."
+    return results or [] # "No matching flights found."
 
 def get_visa_info(query: str): # TODO: place the function in correct module
     """

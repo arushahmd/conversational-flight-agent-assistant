@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from parsers.query_parser import parse_user_query
 
+from flight_search.search import get_available_routes
 from utils.rag_utils import create_qa_chain
 
 st.set_page_config(page_title="Flight Booking Assistant", page_icon="✈️", layout="centered") #Title of the page
@@ -30,6 +31,11 @@ placeholder_text = (
     else "e.g., Do I need a visa to travel from UAE to Japan?"
 )
 
+if query_type == "Flight Info":
+    available_routes = get_available_routes()
+    with st.expander("✈️ Available Routes"):
+        st.markdown(", ".join(available_routes[:10]))
+
 user_query = st.text_input("Your Query", placeholder=placeholder_text) # Get user input
 
 # Main loop that triggers on button click
@@ -40,14 +46,16 @@ if st.button("Submit"):
         st.info("Processing your request...")
 
         if query_type == "Flight Info":
-            parsed_json = parse_user_query(user_query) 
-            st.success("Flight information found:") 
-            
-            df = pd.DataFrame(parsed_json)
-            st.dataframe(df)
-            
-            with st.expander("🔍 See Raw Json"):
-                st.json(parsed_json)
+            flight_results = parse_user_query(user_query) 
+            if flight_results == []:
+                st.warning("No matching flights found with the exact origin and destination.")
+            else:
+                st.success("Flight information found:") 
+                df = pd.DataFrame(flight_results)
+                st.dataframe(df)
+
+                with st.expander("🔍 See Raw Json"):
+                    st.json(flight_results)
         
         elif query_type == "Visa Info":
             st.success("Visa information:")

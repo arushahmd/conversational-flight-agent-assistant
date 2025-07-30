@@ -9,47 +9,65 @@ def load_flights(filepath="data/flights.json"):
     with open(filepath, "r") as f:
         return json.load(f)
 
-def match_flights(query: Dict[str, Any], flights: List[Dict[str, Any]], top_k: int = 2) -> List[Dict[str, Any]]:
+
+def get_available_routes() -> List[str]:
     """
-        Return top k, 2 for now matching flights from the stored json data.
+        get list of all available routes
     """
-    def calculate_score(query: Dict[str, Any], flight: Dict[str, Any]) -> int:
-        score = 0
+    flights = load_flights()
+    seen = set()
+    routes = []
+    for flight in flights:
+        origin = flight["from"].strip()
+        destination = flight["to"].strip()
+        route = (origin, destination)
+        if route not in seen:
+            seen.add(route)
+            routes.append(f"{origin} → {destination}")
+    return routes
 
-        if query.get("origin") and query["origin"].lower() in flight.get("from", "").lower():
-            score += 1
 
-        if query.get("destination") and query["destination"].lower() in flight.get("to", "").lower():
-            score += 1
+def score_flight(flight: Dict[str, Any]) -> float:
+    """
+    Define your custom scoring logic here.
+    For example: lower price and shorter duration = better score.
+    You can adapt this as needed.
+    """
+    price_score = 1 / (flight.get("price", 1000) + 1)
+    duration_score = 1 / (flight.get("duration", 999) + 1)
+    rating_score = flight.get("airline_rating", 0) / 5  # Optional
 
-        if query.get("departure_date") == flight.get("departure_date"):
-            score += 1
+    return 0.5 * price_score + 0.3 * duration_score + 0.2 * rating_score
 
-        if query.get("return_date") == flight.get("return_date"):
-            score += 1
 
-        if query.get("refundable") and flight.get("refundable"):
-            score += 1
+def match_flights(queries: List[Dict[str, Any]], flights: List[Dict[str, Any]], top_k: int = 2) -> List[Dict[str, Any]]:
+    """
+    Takes a list of flight search queries and returns top matching flights for each valid query.
+    Filters flights that match 'from' and 'to' fields exactly before scoring.
 
-        if query.get("alliance") and query["alliance"].lower() in flight.get("alliance", "").lower():
-            score += 1
+    Returns a flat list of top-k results for each query.
+    """
+    matched_results = []
 
-        if query.get("layovers"):
-            flight_layovers = [l.lower() for l in flight.get("layovers", [])]
-            if any(lay.lower() in flight_layovers for lay in query["layovers"]):
-                score += 1
+    for query in queries:
+        origin = query.get("origin", "").strip().lower()
+        destination = query.get("destination", "").strip().lower()
 
-        return score
+        if not origin or not destination:
+            continue  # skip invalid query
 
-    # Score all flights
-    scored = [(calculate_score(query, flight), flight) for flight in flights]
+        filtered = [
+            flight for flight in flights
+            if flight.get("from", "").strip().lower() == origin and
+               flight.get("to", "").strip().lower() == destination
+        ]
 
-    # Filter out flights with zero score
-    scored = [item for item in scored if item[0] > 0]
+        if not filtered:
+            continue  # skip if no matching routes
 
-    # Get top-k by score
-    top_matches = nlargest(top_k, scored, key=lambda x: x[0])
+        scored = sorted(filtered, key=score_flight, reverse=True)
+        matched_results.extend(scored[:top_k])
 
-    # Return only the flight dictionaries
-    return [flight for _, flight in top_matches]
+    return matched_results
+
 
