@@ -95,6 +95,6 @@ conversational-travel-assistant/
  - Docker support + cloud deployment
  - Observability + logging
 
-## 👨‍💻 Get in
+## 👨‍💻 Get in Touch
 Aroosh Ahmad — AI Engineer (NLP, LLMs, ML Systems)&nbsp;
 [GitHub](https://github.com/arushahmd) &nbsp;• &nbsp;[LinkedIn](https://www.linkedin.com/in/arooshahmad-data/)
