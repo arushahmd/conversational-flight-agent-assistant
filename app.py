@@ -5,7 +5,7 @@ from parsers.query_parser import parse_user_query
 from flight_search.search import get_available_routes
 from utils.rag_utils import create_qa_chain
 
-st.set_page_config(page_title="✈️ Flight Booking Assistant", page_icon="✈️", layout="centered") #Title of the page
+st.set_page_config(page_title=" Flight Booking Assistant", page_icon="✈️", layout="centered") #Title of the page
 
 with st.sidebar:
     st.sidebar.title("✈️ FlightQuery")
