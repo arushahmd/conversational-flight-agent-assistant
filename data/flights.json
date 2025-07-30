@@ -1,0 +1,68 @@
+[
+  {
+    "airline": "Turkish Airlines",
+    "alliance": "Star Alliance",
+    "from": "Dubai",
+    "to": "Tokyo",
+    "departure_date": "2024-08-15",
+    "return_date": "2024-08-30",
+    "layovers": ["Istanbul"],
+    "price_usd": 950,
+    "refundable": true
+  },
+  {
+    "airline": "Emirates",
+    "alliance": "SkyTeam",
+    "from": "Dubai",
+    "to": "Tokyo",
+    "departure_date": "2024-08-12",
+    "return_date": "2024-08-25",
+    "layovers": ["Bangkok"],
+    "price_usd": 870,
+    "refundable": false
+  },
+  {
+    "airline": "Lufthansa",
+    "alliance": "Star Alliance",
+    "from": "Dubai",
+    "to": "Frankfurt",
+    "departure_date": "2024-09-10",
+    "return_date": "2024-09-25",
+    "layovers": ["Munich"],
+    "price_usd": 1020,
+    "refundable": true
+  },
+  {
+    "airline": "British Airways",
+    "alliance": "Oneworld",
+    "from": "Lahore",
+    "to": "London",
+    "departure_date": "2024-08-20",
+    "return_date": "2024-09-05",
+    "layovers": ["Doha"],
+    "price_usd": 1100,
+    "refundable": true
+  },
+  {
+    "airline": "Qatar Airways",
+    "alliance": "Oneworld",
+    "from": "Karachi",
+    "to": "Tokyo",
+    "departure_date": "2024-08-18",
+    "return_date": "2024-08-30",
+    "layovers": ["Doha"],
+    "price_usd": 920,
+    "refundable": false
+  },
+  {
+    "airline": "Singapore Airlines",
+    "alliance": "Star Alliance",
+    "from": "Dubai",
+    "to": "Tokyo",
+    "departure_date": "2024-08-15",
+    "return_date": "2024-08-30",
+    "layovers": ["Singapore"],
+    "price_usd": 980,
+    "refundable": true
+  }
+]
